@@ -248,6 +248,344 @@ def get_S1_intensity(
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #
 
+def get_S1_IA(
+    safe_folder,
+    feat_folder,
+    overwrite=False,
+    dry_run=False,
+    loglevel='INFO',
+):
+
+    """Extract incident angle (IA) from S1 input image.
+
+    Parameters
+    ----------
+    safe_folder : path to S1 input image SAFE folder
+    feat_folder : path to feature folder where output files are placed
+    overwrite : overwrite existing files (default=False)
+    dry_run : do not execute actual processing (default=False)
+    loglevel : loglevel setting (default='INFO')
+    """
+
+    # remove default logger handler and add personal one
+    logger.remove()
+    logger.add(sys.stderr, level=loglevel)
+
+    logger.info('Extracting IA')
+
+    logger.debug(f'{locals()}')
+    logger.debug(f'file location: {__file__}')
+
+    # get directory where module is installed
+    module_path = pathlib.Path(__file__).parent.parent
+    logger.debug(f'module_path: {module_path}')
+
+    # get directory where config module is installed, which contains snap graphs
+    config_path = pathlib.Path(S1_conf.__file__).parent
+    logger.debug(f'config_path: {config_path}')
+
+# -------------------------------------------------------------------------- #
+
+    # convert folder strings to paths
+    safe_folder = pathlib.Path(safe_folder).expanduser().absolute()
+    feat_folder = pathlib.Path(feat_folder).expanduser().absolute()
+
+    logger.debug(f'safe_folder: {safe_folder}')
+    logger.debug(f'feat_folder: {feat_folder}')
+    logger.debug(f'S1_conf.GPT: {S1_conf.GPT}')
+
+    if not os.path.exists(S1_conf.GPT):
+        logger.error(f'Cannot find snap GPT executable: {S1_conf.GPT}')
+        raise FileNotFoundError(f'Cannot find snap GPT executable: {S1_conf.GPT}')
+
+    if not safe_folder.is_dir():
+        logger.error(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
+        raise NotADirectoryError(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
+
+    # get S1 basename from safe_folder
+    f_base = safe_folder.stem
+
+    # build datestring
+    date, datetime, datestring = S1_info.get_S1_datestring(f_base)
+
+    # get product mode and type
+    p_mode, p_type, p_pol = S1_info.get_S1_product_info(f_base)
+
+    logger.debug(f'f_base:     {f_base}')
+    logger.debug(f'date:       {date}')
+    logger.debug(f'datetime:   {datetime}')
+    logger.debug(f'datestring: {datestring}')
+    logger.debug(f'p_mode:     {p_mode}')
+    logger.debug(f'p_type:     {p_type}')
+    logger.debug(f'p_pol:      {p_pol}')
+
+# -------------------------------------------------------------------------- #
+
+    # define outfile_basename
+    outfile_basename = 'IA'
+
+    # define output file name and path
+    img_path = feat_folder / f'{outfile_basename}.img'
+    hdr_path = feat_folder / f'{outfile_basename}.hdr'
+
+    logger.debug(f'img_path: {img_path}')
+    logger.debug(f'hdr_path: {hdr_path}')
+
+    # check if outfile already exists
+    if img_path.is_file() and not overwrite:
+        logger.info('Output file already exists, use `-overwrite` to force')
+        return 
+
+    # create feat_folder if needed
+    feat_folder.mkdir(parents=True, exist_ok=True)
+
+    # create tmp dir for snap output
+    tmp_folder = feat_folder / 'tmp'
+    if tmp_folder.is_dir():
+        logger.debug('Removing existing tmp_folder')
+        shutil.rmtree(tmp_folder)
+    tmp_folder.mkdir(exist_ok=False)
+
+# -------------------------------------------------------------------------- #
+
+    # set snap graph file
+    snap_graph_file = S1_conf.snap_S1_IA
+
+    # build snap_graph_path
+    snap_graph_path = config_path / 'snap_graphs' / snap_graph_file
+
+    # set snap input and output files
+    snap_infile  = safe_folder
+    snap_outfile = tmp_folder / 'tmp.dim'
+
+    logger.debug(f'snap_graph_path: {snap_graph_path}')
+    logger.debug(f'snap_infile:     {snap_infile}')
+    logger.debug(f'snap_outfile:    {snap_outfile}')
+
+    # check that snap_graph_path exists
+    if not snap_graph_path.is_file():
+        logger.error(f'Cannot find snap_graph_path: {snap_graph_path}')
+        raise FileNotFoundError(f'Cannot find snap_graph_path: {snap_graph_path}')
+
+# -------------------------------------------------------------------------- #
+
+    # build the snap graph command
+    # needs double quotes around {S1_conf.GPT} to avoid issues with spaces in
+    # file names on windows
+    snap_cmd = f'"{S1_conf.GPT}" ' + \
+        f'{snap_graph_path} ' + \
+        f'-PinFile={snap_infile} ' + \
+        f'-PoutFile={snap_outfile}'
+
+    logger.debug('Running snap to create snap_outfile')
+    logger.debug(f'Executing: {snap_cmd}')
+
+    # dry_run? do not execute
+    if dry_run:
+        logger.info('Dry-run - not performing actual processing')
+        shutil.rmtree(tmp_folder)
+        return 
+
+
+    # system call snap_command
+    os.system(snap_cmd)
+
+    # copy image files to feat_folder
+    shutil.copyfile(tmp_folder / 'tmp.data' / 'incAngle.img', img_path)
+    shutil.copyfile(tmp_folder / 'tmp.data' / 'incAngle.hdr', hdr_path)
+
+    # remove snap tmp_dir
+    shutil.rmtree(tmp_folder)
+
+# -------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------- #
+
+def get_S1_lat_lon(
+    safe_folder,
+    feat_folder,
+    overwrite=False,
+    dry_run=False,
+    loglevel='INFO',
+):
+
+    """Extract lat/lon from S1 input image.
+
+    Parameters
+    ----------
+    safe_folder : path to S1 input image SAFE folder
+    feat_folder : path to feature folder where output files are placed
+    overwrite : overwrite existing files (default=False)
+    dry_run : do not execute actual processing (default=False)
+    loglevel : loglevel setting (default='INFO')
+    """
+
+    # remove default logger handler and add personal one
+    logger.remove()
+    logger.add(sys.stderr, level=loglevel)
+
+    logger.info('Extracting lat/lon')
+
+    logger.debug(f'{locals()}')
+    logger.debug(f'file location: {__file__}')
+
+    # get directory where module is installed
+    module_path = pathlib.Path(__file__).parent.parent
+    logger.debug(f'module_path: {module_path}')
+
+    # get directory where config module is installed, which contains snap graphs
+    config_path = pathlib.Path(S1_conf.__file__).parent
+    logger.debug(f'config_path: {config_path}')
+
+# -------------------------------------------------------------------------- #
+
+    # convert folder strings to paths
+    safe_folder = pathlib.Path(safe_folder).expanduser().absolute()
+    feat_folder = pathlib.Path(feat_folder).expanduser().absolute()
+
+    logger.debug(f'safe_folder: {safe_folder}')
+    logger.debug(f'feat_folder: {feat_folder}')
+    logger.debug(f'S1_conf.GPT: {S1_conf.GPT}')
+
+    if not os.path.exists(S1_conf.GPT):
+        logger.error(f'Cannot find snap GPT executable: {S1_conf.GPT}')
+        raise FileNotFoundError(f'Cannot find snap GPT executable: {S1_conf.GPT}')
+
+    if not safe_folder.is_dir():
+        logger.error(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
+        raise NotADirectoryError(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
+
+    # get S1 basename from safe_folder
+    f_base = safe_folder.stem
+
+    # build datestring
+    date, datetime, datestring = S1_info.get_S1_datestring(f_base)
+
+    # get product mode and type
+    p_mode, p_type, p_pol = S1_info.get_S1_product_info(f_base)
+
+    logger.debug(f'f_base:     {f_base}')
+    logger.debug(f'date:       {date}')
+    logger.debug(f'datetime:   {datetime}')
+    logger.debug(f'datestring: {datestring}')
+    logger.debug(f'p_mode:     {p_mode}')
+    logger.debug(f'p_type:     {p_type}')
+    logger.debug(f'p_pol:      {p_pol}')
+
+# -------------------------------------------------------------------------- #
+
+    # define outfile_basenames
+    outfile_basename_1 = 'lat'
+    outfile_basename_2 = 'lon'
+
+    # define output file name and path
+    img_path_1 = feat_folder / f'{outfile_basename_1}.img'
+    hdr_path_1 = feat_folder / f'{outfile_basename_1}.hdr'
+    img_path_2 = feat_folder / f'{outfile_basename_2}.img'
+    hdr_path_2 = feat_folder / f'{outfile_basename_2}.hdr'
+
+    logger.debug(f'img_path_1: {img_path_1}')
+    logger.debug(f'hdr_path_1: {hdr_path_1}')
+    logger.debug(f'img_path_2: {img_path_2}')
+    logger.debug(f'hdr_path_2: {hdr_path_2}')
+
+    # check if outfiles already exist
+    if img_path_1.is_file() and img_path_2.is_file() and not overwrite:
+        logger.info('Output files already exist, use `-overwrite` to force')
+        return 
+
+    # create feat_folder if needed
+    feat_folder.mkdir(parents=True, exist_ok=True)
+
+    # create tmp dir for snap output
+    tmp_folder = feat_folder / 'tmp'
+    if tmp_folder.is_dir():
+        logger.debug('Removing existing tmp_folder')
+        shutil.rmtree(tmp_folder)
+    tmp_folder.mkdir(exist_ok=False)
+
+# -------------------------------------------------------------------------- #
+
+    # set snap graph files
+    snap_graph_file_1 = S1_conf.snap_S1_lat
+    snap_graph_file_2 = S1_conf.snap_S1_lon
+
+    # build snap_graph_paths
+    snap_graph_path_1 = config_path / 'snap_graphs' / snap_graph_file_1
+    snap_graph_path_2 = config_path / 'snap_graphs' / snap_graph_file_2
+
+    # set snap input and output files
+    snap_infile  = safe_folder
+    snap_outfile = tmp_folder / 'tmp.dim'
+
+    logger.debug(f'snap_graph_path_1: {snap_graph_path_1}')
+    logger.debug(f'snap_graph_path_2: {snap_graph_path_2}')
+    logger.debug(f'snap_infile:       {snap_infile}')
+    logger.debug(f'snap_outfile:      {snap_outfile}')
+
+    # check that snap_graph_paths exists
+    if not snap_graph_path_1.is_file():
+        logger.error(f'Cannot find snap_graph_path_1: {snap_graph_path_1}')
+        raise FileNotFoundError(f'Cannot find snap_graph_path_1: {snap_graph_path_1}')
+    if not snap_graph_path_2.is_file():
+        logger.error(f'Cannot find snap_graph_path_2: {snap_graph_path_2}')
+        raise FileNotFoundError(f'Cannot find snap_graph_path_2: {snap_graph_path_2}')
+
+# -------------------------------------------------------------------------- #
+
+    # build the snap graph commands
+    # needs double quotes around {S1_conf.GPT} to avoid issues with spaces in
+    # file names on windows
+    snap_cmd_1 = f'"{S1_conf.GPT}" ' + \
+        f'{snap_graph_path_1} ' + \
+        f'-PinFile={snap_infile} ' + \
+        f'-PoutFile={snap_outfile}'
+    snap_cmd_2 = f'"{S1_conf.GPT}" ' + \
+        f'{snap_graph_path_2} ' + \
+        f'-PinFile={snap_infile} ' + \
+        f'-PoutFile={snap_outfile}'
+
+    logger.debug('Running snap to create snap_outfile')
+    logger.debug(f'Executing: {snap_cmd_1}')
+    logger.debug(f'Executing: {snap_cmd_2}')
+
+    # dry_run? do not execute
+    if dry_run:
+        logger.info('Dry-run - not performing actual processing')
+        shutil.rmtree(tmp_folder)
+        return 
+
+
+    # system call snap_command
+    os.system(snap_cmd_1)
+
+    # copy image files to feat_folder
+    shutil.copyfile(tmp_folder / 'tmp.data' / f'{outfile_basename_1}.img', img_path_1)
+    shutil.copyfile(tmp_folder / 'tmp.data' / f'{outfile_basename_1}.hdr', hdr_path_1)
+
+    # remove snap tmp_dir and create again empty
+    shutil.rmtree(tmp_folder)
+    tmp_folder.mkdir(exist_ok=False)
+
+
+    # system call snap_command
+    os.system(snap_cmd_2)
+
+    # copy image files to feat_folder
+    shutil.copyfile(tmp_folder / 'tmp.data' / f'{outfile_basename_2}.img', img_path_2)
+    shutil.copyfile(tmp_folder / 'tmp.data' / f'{outfile_basename_2}.hdr', hdr_path_2)
+
+    # remove snap tmp_dir and create again empty
+    shutil.rmtree(tmp_folder)
+
+# -------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------- #
+
 def get_S1_swath_mask(
     safe_folder,
     feat_folder,
