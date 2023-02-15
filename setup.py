@@ -19,6 +19,7 @@ setup(
         'ipython',
         'loguru',
         'lxml',
+        'python-dotenv',
     ],
     packages = find_packages(where='src'),
     package_dir = {'': 'src'},

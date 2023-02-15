@@ -4,10 +4,16 @@
 Configuration for settings for S1_processing library
 """ 
 
+from dotenv import load_dotenv
+from os.path import join, dirname
 from os import environ
 
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #
+
+# load local .env file
+dotenv_path = join(dirname(__file__), '.env')
+load_dotenv(dotenv_path)
 
 # get snap gpt executable
 GPT = environ.get('GPT', '/home/jo/esa_snap/snap/bin/gpt')
