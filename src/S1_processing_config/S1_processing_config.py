@@ -16,7 +16,7 @@ dotenv_path = join(dirname(__file__), '.env')
 load_dotenv(dotenv_path)
 
 # get snap gpt executable
-GPT = environ.get('GPT', '/home/jo/esa_snap/snap/bin/gpt')
+GPT = environ.get('GPT', '/home/jo/esa_snap/snap/bin/gpt_test')
 
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #

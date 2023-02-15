@@ -23,7 +23,7 @@ setup(
     ],
     packages = find_packages(where='src'),
     package_dir = {'': 'src'},
-    package_data = {'': ['*.xml']},
+    package_data = {'': ['*.xml', '.env']},
     entry_points = {
         'console_scripts': [
         ]
