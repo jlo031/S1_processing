@@ -12,13 +12,16 @@ import S1_feature_extraction as S1_feat
 # -------------------------------------------------------------------------- #
 
 # define the basic data directory for your project
-BASE_DIR = pathlib.Path('/home/jo/data/Sentinel-1/')
+BASE_DIR = pathlib.Path('/home/jo/Data/test_examples/Sentinel-1')
+
+# define S1 name
+S1_name = 'S1A_EW_GRDM_1SDH_20230213T084319_20230213T084419_047215_05AA57_0C88'
 
 # build the path to S1 SAFE folder
-safe_folder = BASE_DIR / 'L1/S1A_EW_GRDM_1SDH_20230208T065619_20230208T065723_047141_05A7E5_F291.SAFE'
+safe_folder = BASE_DIR / 'L1/' f'{S1_name}.SAFE'
 
 # build the path to output feature folder
-feat_folder = BASE_DIR / 'features/S1A_EW_GRDM_1SDH_20230208T065619_20230208T065723_047141_05A7E5_F291'
+feat_folder = BASE_DIR / f'features/{S1_name}'
 
 # build the path to folder for 8bit rgb images
 rgb_folder = BASE_DIR / 'rgb'
