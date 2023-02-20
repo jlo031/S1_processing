@@ -17,9 +17,9 @@ import numpy as np
 from osgeo import gdal
 from scipy import ndimage as ndim
 
-import S1_processing_config as S1_conf
-import S1_product_info as S1_info
-import S1_swath_mask as S1_sm
+import S1_processing.S1_processing_config as S1_conf
+import S1_processing.S1_product_info as S1_info
+import S1_processing.S1_swath_mask as S1_sm
 
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #

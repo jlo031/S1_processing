@@ -1,6 +1,6 @@
-# ---- This is <get_S1_swath_mask.py> ----
+# ---- This is <get_S1_lat_lon.py> ----
 
-import S1_feature_extraction as S1_features
+import S1_processing.S1_feature_extraction as S1_features
 import argparse
 from loguru import logger
 
@@ -11,7 +11,7 @@ def make_parser():
 
     p = argparse.ArgumentParser(
         formatter_class = argparse.RawDescriptionHelpFormatter,
-        description = S1_features.get_S1_swath_mask.__doc__.split("\n")[0],
+        description = S1_features.get_S1_lat_lon.__doc__.split("\n")[0],
     )
 
     p.add_argument(
@@ -26,6 +26,11 @@ def make_parser():
         '-overwrite',
         action = 'store_true',
         help = 'overwrite existing files'
+    )
+    p.add_argument(
+        '-dry_run',
+        action = 'store_true',
+        help = 'do not execute actual processing'
     )
     p.add_argument(
         '-loglevel',
@@ -44,10 +49,10 @@ if __name__ == '__main__':
     args = p.parse_args()
 
     try:
-        S1_features.get_S1_swath_mask(**vars(args))
+        S1_features.get_S1_lat_lon(**vars(args))
     except Exception as E:
         logger.critical(E)
 
 # -------------------------------------------------------------------------- #
 
-# ---- End of <get_S1_swath_mask.py> ----
+# ---- End of <get_S1_lat_lon.py> ----

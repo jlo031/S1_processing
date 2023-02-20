@@ -6,7 +6,7 @@ Example for easy use of 'S1_processing' library for feature extraction.
 
 import pathlib
 
-import S1_feature_extraction as S1_feat
+import S1_processing.S1_feature_extraction as S1_feat
 
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #

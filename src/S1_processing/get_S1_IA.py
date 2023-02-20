@@ -1,6 +1,6 @@
 # ---- This is <get_S1_IA.py> ----
 
-import S1_feature_extraction as S1_features
+import S1_processing.S1_feature_extraction as S1_features
 import argparse
 from loguru import logger
 
