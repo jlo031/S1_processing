@@ -20,7 +20,6 @@ setup(
         'loguru',
         'lxml',
         'python-dotenv',
-        'chardet',
     ],
     packages = find_packages(where='src'),
     package_dir = {'': 'src'},
