@@ -26,9 +26,9 @@ Start by cloning the repository:
     # clone the repository
     git clone https://github.com/jlo031/S1_processing
 
-Part of the code in this library uses the graph processing tool (__gpt__) from ESA's [SNAP] application. Before installation, you have to create a local _".env"_ file with a variable called GPT that points to the __gpt__ executable of your local SNAP installation. The _".env"_ file must be located in the folder _"S1_processing/src/S1_processing_config/"_ of the cloned repository and must contain the following line:
+Part of the code in this library uses the graph processing tool (__gpt__) from ESA's [SNAP] application. Before installation, you have to create a local _".env"_ file with a variable called GPT that points to the __gpt__ executable of your local SNAP installation. The _".env"_ file must be located at _"S1_processing/src/S1_processing/.env"_ of the cloned repository and must contain the following line:
 
->GPT="path/to/your/esa_snap/gpt"
+>GPT="/path/to/your/esa_snap/gpt"
 
 Now, change into the main directory of the cloned repository (it should contain the 'setup.py' file) and install the library by running:
 
