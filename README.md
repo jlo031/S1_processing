@@ -1,4 +1,4 @@
-# S1_processing
+# Sentinel-1 basic processing
 This library provides python code for standard feature extraction and processing of Copernicus Sentinel-1 data.
 
 
