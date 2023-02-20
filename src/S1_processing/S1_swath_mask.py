@@ -1,7 +1,7 @@
 # ---- This is <S1_swath_mask.py> ----
 
 """
-Creating swath-masks for Sentinel-1 EW images.
+Creating swath-masks for Sentinel-1 EW images
 
 Adapted from Thomas Kramer.
 """
@@ -42,7 +42,7 @@ def annotation_path_from_manifest_path(manifest_path, polarization):
 # -------------------------------------------------------------------------- # 
 
 def get_swath_mask(manifest_path, swath, polarization):
-  """ Get swath mask for S1 EW image.
+  """ Get swath mask for S1 EW image
 
   Parameters
   ----------

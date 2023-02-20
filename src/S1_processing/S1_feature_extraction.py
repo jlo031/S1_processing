@@ -1,7 +1,7 @@
 # ---- This is <S1_feature_extraction.py> ----
 
 """
-Module for extraction of Sentinel-1 features.
+Module for extraction of Sentinel-1 features
 """ 
 
 import argparse
@@ -35,7 +35,7 @@ def get_S1_intensity(
     loglevel='INFO',
 ):
 
-    """Extract intensity channel from S1 input image.
+    """Extract intensity channel from S1 input image
 
     Parameters
     ----------
@@ -256,7 +256,7 @@ def get_S1_IA(
     loglevel='INFO',
 ):
 
-    """Extract incident angle (IA) from S1 input image.
+    """Extract incident angle (IA) from S1 input image
 
     Parameters
     ----------
@@ -411,7 +411,7 @@ def get_S1_lat_lon(
     loglevel='INFO',
 ):
 
-    """Extract lat/lon from S1 input image.
+    """Extract lat/lon from S1 input image
 
     Parameters
     ----------
@@ -593,7 +593,7 @@ def get_S1_swath_mask(
     loglevel='INFO',
 ):
 
-    """Extract swath mask from S1 input image.
+    """Extract swath mask from S1 input image
 
     Parameters
     ----------
@@ -751,7 +751,7 @@ def make_S1_rgb(
     loglevel='INFO',
 ):
 
-    """Scale intensity channels of S1 input image and stack to 8bit RGB.
+    """Scale intensity channels of S1 input image and stack to 8bit RGB
 
     Parameters
     ----------

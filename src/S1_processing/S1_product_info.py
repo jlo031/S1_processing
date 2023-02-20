@@ -1,7 +1,7 @@
 # ---- This is <S1_product_info.py> ----
 
 """
-Collection of simple function snippets to work with S1 data.
+Collection of simple function snippets to work with S1 data
 """
 
 import os
@@ -13,7 +13,7 @@ from osgeo import gdal
 # -------------------------------------------------------------------------- #
 
 def get_S1_datestring(f_base):
-    """Build datestring from S1 basename.
+    """Build datestring from S1 basename
 
     Parameters
     ----------
@@ -52,7 +52,7 @@ def get_S1_datestring(f_base):
 # -------------------------------------------------------------------------- #
 
 def get_S1_product_info(f_base):
-    """Get product info from S1 basename.
+    """Get product info from S1 basename
 
     Parameters
     ----------
@@ -109,7 +109,7 @@ def get_S1_product_info(f_base):
 # -------------------------------------------------------------------------- #
 
 def get_S1_zip_name(f_base):
-    """Build zip-file name and manifest.safe file name from S1 basename.
+    """Build zip-file name and manifest.safe file name from S1 basename
 
     Parameters
     ----------
