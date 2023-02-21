@@ -24,7 +24,7 @@ Creating python environments with a working __gdal__ distribution can be tricky 
 Start by cloning the repository:
 
     # clone the repository
-    git clone https://github.com/jlo031/S1_processing.git
+    git clone git@github.com:jlo031/S1_processing.git
 
 Part of the code in this library uses the graph processing tool (__gpt__) from ESA's [SNAP] application. Before installation, you have to create a local _".env"_ file with a variable called GPT that points to the __gpt__ executable of your local SNAP installation. The _".env"_ file must be located at _"S1_processing/src/S1_processing/.env"_ of the cloned repository and must contain the following line:
 
