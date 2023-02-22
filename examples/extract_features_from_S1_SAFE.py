@@ -12,10 +12,11 @@ import S1_processing.S1_feature_extraction as S1_feat
 # -------------------------------------------------------------------------- #
 
 # define the basic data directory for your project
-BASE_DIR = pathlib.Path('/home/jo/Data/test_examples/Sentinel-1')
+BASE_DIR = pathlib.Path('/Data/jlo031/ResearchData/IFT/EarthObservation/belgica_bank/Sentinel-1')
 
 # define S1 name
-S1_name = 'S1A_EW_GRDM_1SDH_20220502T074527_20220502T074631_043029_05233F_7BC7'
+S1_name = 'S1A_EW_GRDM_1SDH_20220301T080145_20220301T080249_042125_0504D4_A30C' # this one works, is the same as local
+S1_name = 'S1A_EW_GRDM_1SDH_20220512T080252_20220512T080352_043175_052801_46E4'
 
 # build the path to S1 SAFE folder
 safe_folder = BASE_DIR / 'L1/' f'{S1_name}.SAFE'
