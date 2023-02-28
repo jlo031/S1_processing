@@ -147,15 +147,9 @@ def get_S1_intensity(
         looks_rg = int(ML.split('x')[0])
         looks_az = int(ML.split('x')[1])
     except:
-        logger.error(
-            f'Cannot extract looks_rg and looks_az from ML parameter: {ML}'
-        )
-        logger.error(
-            f'Expected format for ML argument: looks_rgxlooks_az'
-        )
-        raise ValueError(
-            f'Cannot extract looks_rg and looks_az from ML parameter: {ML}'
-        )
+        logger.error(f'Cannot extract looks_rg and looks_az from ML parameter: {ML}')
+        logger.error(f'Expected format for ML argument: looks_rgxlooks_az')
+        raise ValueError(f'Cannot extract looks_rg and looks_az from ML parameter: {ML}')
 
     logger.debug(f'looks_rg: {looks_rg}')
     logger.debug(f'looks_az: {looks_az}')
