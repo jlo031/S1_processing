@@ -51,10 +51,10 @@ snap_S1_EW_GRDH_NR_Cal_db_XX     = 'S1_EW_GRDM/S1_EW_GRDH_NR_Cal_dB_XX.xml'
 # with and without speckle filter (ML)
 # with and without dB
 
-snap_S1_IW_GRDH_NR_Cal_Spk_XX    = 'S1_IW_GRDM/S1_IW_GRDH_NR_Cal_Spk_XX.xml'
-snap_S1_IW_GRDH_NR_Cal_Spk_db_XX = 'S1_IW_GRDM/S1_IW_GRDH_NR_Cal_Spk_dB_XX.xml'
-snap_S1_IW_GRDH_NR_Cal_XX        = 'S1_IW_GRDM/S1_IW_GRDH_NR_Cal_XX.xml'
-snap_S1_IW_GRDH_NR_Cal_db_XX     = 'S1_IW_GRDM/S1_IW_GRDH_NR_Cal_dB_XX.xml'
+snap_S1_IW_GRDH_NR_Cal_Spk_XX    = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_XX.xml'
+snap_S1_IW_GRDH_NR_Cal_Spk_db_XX = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_dB_XX.xml'
+snap_S1_IW_GRDH_NR_Cal_XX        = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_XX.xml'
+snap_S1_IW_GRDH_NR_Cal_db_XX     = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_dB_XX.xml'
 
 # --------- #
 
