@@ -8,20 +8,20 @@ Features extracted:
 All extracted features are saved in tif format in the 'features' folder.
 '''
 
-from ice_water_cnn_qiang.extract_features import extract_features
+import S1_processing.S1_feature_extraction_nersc as S1_feat
 from pathlib import Path
 from loguru import logger
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #
 
 # define the basic data directory for your project
-BASE_DIR = Path('/scratch/cta014/Sentinel1/CNN_ice_water/training')
+BASE_DIR = Path('/scratch/cta014/Sentinel1/CNN_ice_water/inference')
 
 # define the level 1 (L1) data directory (i.e.where SAFE folders are stored)
 BASE_L1 = BASE_DIR / 'originals'
 
 # read in list of S1 basenames to process
-S1_list = open((BASE_DIR / 'S1_imagelist_training.txt'), 'r')
+S1_list = open((BASE_DIR / 'S1_imagelist_inference.txt'), 'r')
 ID_to_process = S1_list.read().splitlines()
 
 for S1_name in ID_to_process:
@@ -40,5 +40,5 @@ for S1_name in ID_to_process:
     
     # extract features from S1 
     logger.info(f'Extracting features for {S1_name}')
-    extract_features(str(safe_folder), str(feat_folder), algorithm, overwrite)
+    S1_feat.extract_features(str(safe_folder), str(feat_folder), algorithm, overwrite)
 
