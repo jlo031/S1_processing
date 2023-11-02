@@ -7,6 +7,12 @@ Adapted from Thomas Kramer.
 """
 
 from loguru import logger
+import sys
+from pathlib import Path
+import tifffile as tf
+import numpy as np
+
+from S1_processing.S1_product_info import get_S1_product_info
 
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- # 
@@ -92,5 +98,86 @@ def get_swath_mask(manifest_path, swath, polarization):
 
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #
+
+def get_full_S1_swath_mask(safe_folder, feat_folder, overwrite=False):
+
+    """Extract full swath mask for a S1 EW input image and save to tiff
+
+    Parameters
+    ----------
+    safe_folder : path to S1 input image SAFE folder
+    feat_folder : path to feature folder where output tif file is placed
+    overwrite : overwrite existing files (default=False)
+    """
+    
+    # remove default logger handler and add personal one
+    loglevel = 'INFO'
+    logger.remove()
+    logger.add(sys.stderr, level=loglevel)
+    
+    logger.info('Extracting S1 swath mask')
+    
+    # -------------------------------------------------------------------------- #
+    
+    # convert folder strings to paths
+    safe_folder = Path(safe_folder).expanduser().absolute()
+    feat_folder = Path(feat_folder).expanduser().absolute()
+    
+    logger.debug(f'safe_folder: {safe_folder}')
+    logger.debug(f'feat_folder: {feat_folder}')
+    
+    if not safe_folder.is_dir():
+        logger.error(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
+        raise NotADirectoryError(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
+    
+    # get S1 basename from safe_folder
+    f_base = safe_folder.stem
+    
+    # get product mode and type
+    p_mode, p_type, p_pol = get_S1_product_info(f_base)
+    
+    # define manifest_path
+    manifest_path = safe_folder / 'manifest.safe'
+    
+    # define outfile_basename
+    outfile_basename = 'swath_mask'
+    
+    # define output file name and path
+    outfile_tif_path = feat_folder / f'{outfile_basename}.tif'
+    
+    # check if outfile already exists
+    if outfile_tif_path.is_file() and not overwrite:
+        logger.info('Output file: {outfile_tif_path} already exists, use `-overwrite` to force')
+        return 
+
+    # create feat_folder if needed
+    feat_folder.mkdir(parents=True, exist_ok=True)
+    
+    # -------------------------------------------------------------------------- #
+    
+    # define swath names
+    swaths = ["EW1", "EW2", "EW3", "EW4", "EW5"]
+    
+    # get number of swaths
+    number_of_swaths = len(swaths)
+    
+    # loop over all swaths
+    for swath_number, swath_name in enumerate(swaths, 1):
+        logger.debug(f'Extracting swath {swath_number}/{number_of_swaths}: {swath_name}')
+    
+        if swath_number == 1:
+            swath_mask = get_swath_mask(manifest_path, swath_name, p_pol[0])
+        else:
+            swath_mask = swath_mask + (swath_number) * get_swath_mask(
+                manifest_path, swath_name, p_pol[0]
+            )
+            
+  # -------------------------------------------------------------------------- #
+
+    # write swath_mask to disk
+    tf.imsave(outfile_tif_path.as_posix(), swath_mask, dtype=np.uint8)
+       
+# -------------------------------------------------------------------------- #
+# -------------------------------------------------------------------------- #    
 
 # ---- End of <S1_swath_mask.py> ----

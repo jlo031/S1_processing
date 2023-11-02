@@ -9,7 +9,7 @@ import numpy as np
 import os
 from loguru import logger
 
-from S1_processing.S1_swath_mask_Cat import get_full_S1_swath_mask
+from S1_processing.S1_swath_mask import get_full_S1_swath_mask
 from S1_processing.write_raster_to_tif import write_to_tif
 
 def extract_features(path_to_safe, path_to_features, algorithm_nesz = 'NERSC', overwrite = False):
