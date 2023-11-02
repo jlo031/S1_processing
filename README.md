@@ -18,6 +18,7 @@ Creating python environments with a working __gdal__ distribution can be tricky 
     # install required packages
     conda install ipython scipy loguru lxml python-dotenv
 
+**NOTE**: to run feature extraction using NERSC denoising algorithm, setup the environment like specified in https://github.com/nansencenter/sentinel1denoised. Then install any remaining necessary packages afterwards.
 
 ### Installation
 
