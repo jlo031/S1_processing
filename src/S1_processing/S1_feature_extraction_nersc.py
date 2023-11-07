@@ -70,7 +70,7 @@ def get_IA_nersc(path_to_safe,
     s1_IA = s1_IA.astype(np.float32)
 
     # write IA band to tif file
-    write_to_tif(s1_IA, (feat_folder / 'IA.tif'))
+    write_to_tif(s1_IA, tif_path.as_posix())
     
     return
 
@@ -140,7 +140,7 @@ def get_sigma0_nersc(path_to_safe,
         return
     
     # create s1 object using Nansat package
-    s1 = Sentinel1Image(safe_folder.as_posix)
+    s1 = Sentinel1Image(safe_folder.as_posix())
     
     # run thermal noise correction with the ESA or NERSC algorithm
     sigma0_denoised = s1.remove_thermal_noise(polarization, denoising_algorithm)
@@ -228,6 +228,7 @@ def extract_features(path_to_safe,
     # extract lat/lon bands
     S1_feat.get_S1_lat_lon(safe_folder,
                            feat_folder,
+                           overwrite=overwrite,
                            loglevel=loglevel)
 
     return

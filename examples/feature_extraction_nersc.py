@@ -24,7 +24,7 @@ BASE_L1 = BASE_DIR / 'originals'
 S1_list = open((BASE_DIR / 'S1_imagelist_inference.txt'), 'r')
 ID_to_process = S1_list.read().splitlines()
 
-ID_to_process = ID_to_process[0]
+#ID_to_process = ID_to_process[0]
 
 for S1_name in ID_to_process:
 

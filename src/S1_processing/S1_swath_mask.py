@@ -99,7 +99,7 @@ def get_swath_mask(manifest_path, swath, polarization):
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #
 
-def get_full_S1_swath_mask(safe_folder, feat_folder, overwrite=False):
+def get_full_S1_swath_mask(safe_folder, feat_folder, overwrite=False, loglevel='INFO'):
 
     """Extract full swath mask for a S1 EW input image and save to tiff
 
@@ -111,7 +111,6 @@ def get_full_S1_swath_mask(safe_folder, feat_folder, overwrite=False):
     """
     
     # remove default logger handler and add personal one
-    loglevel = 'INFO'
     logger.remove()
     logger.add(sys.stderr, level=loglevel)
     
