@@ -24,6 +24,8 @@ BASE_L1 = BASE_DIR / 'originals'
 S1_list = open((BASE_DIR / 'S1_imagelist_inference.txt'), 'r')
 ID_to_process = S1_list.read().splitlines()
 
+ID_to_process = ID_to_process[0]
+
 for S1_name in ID_to_process:
 
     # build the path to S1 SAFE folder
@@ -35,10 +37,18 @@ for S1_name in ID_to_process:
     # algorithm to use for NESZ extraction, choose from ['ESA', 'NERSC']
     algorithm = 'NERSC'
     
+    # convert Sigma0 values to decibels
+    dB = True
+    
     # overwrite existing features?
     overwrite = False
     
     # extract features from S1 
     logger.info(f'Extracting features for {S1_name}')
-    S1_feat.extract_features(str(safe_folder), str(feat_folder), algorithm, overwrite)
+    
+    S1_feat.extract_features(safe_folder, 
+                             feat_folder, 
+                             denoising_algorithm = algorithm, 
+                             dB = dB,
+                             overwrite = overwrite)
 
