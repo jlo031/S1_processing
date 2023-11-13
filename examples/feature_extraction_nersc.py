@@ -1,11 +1,11 @@
 ''' 
-Script showing how to extract S1 features needed to train or run inference on CNN network.
+Extract the following features from S1 EW GRDM SAFE product: 
+        1) IA
+        2) denoised sigma_0 intensity values for HH and HV channels (with either ESA or NERSC denoising algorithm) 
+        3) swath mask
+        4) lat/lon bands
 
-Features extracted: 
-    - Sigma0 in dB for HH and HV, denoised with either ESA or NERSC algorithm
-    - incident angle (IA)
-    - swath mask
-All extracted features are saved in tif format in the 'features' folder.
+Features 1-3 are saved in tif format, feature 4 (lat/lon bands) is saved in ENVI format.
 '''
 
 import S1_processing.S1_feature_extraction_nersc as S1_feat
