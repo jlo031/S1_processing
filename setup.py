@@ -9,11 +9,12 @@ setup(
     name = "S1_processing",
     version = "0.0.1",
     author = "Johannes Lohse",
-    author_email = "johannes.lohse@uit.no",
+    author_email = "johannes.lohse@utas.edu.au",
     description = ("Feature extraction and processing of S1 data."),
     license = "The Ask Johannes Before You Do Anything License",
     long_description=read('README.md'),
     install_requires = [
+        'gdal',
         'numpy',
         'scipy',
         'ipython',
