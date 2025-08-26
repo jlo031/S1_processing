@@ -17,7 +17,6 @@ setup(
         'gdal',
         'numpy',
         'scipy',
-        'ipython',
         'loguru',
         'lxml',
         'python-dotenv',

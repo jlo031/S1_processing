@@ -20,6 +20,7 @@ from scipy import ndimage as ndim
 import S1_processing.S1_processing_config as S1_conf
 import S1_processing.S1_product_info as S1_info
 import S1_processing.S1_swath_mask as S1_sm
+import S1_processing.utils as S1_utils
 
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #
@@ -28,6 +29,7 @@ def get_S1_intensity(
     safe_folder,
     feat_folder,
     intensity,
+    GPT,
     ML='1x1',
     dB=False,
     overwrite=False,
@@ -42,6 +44,7 @@ def get_S1_intensity(
     safe_folder : path to S1 input image SAFE folder
     feat_folder : path to feature folder where output files are placed
     intensity : intensity band to extract (HH, HV, VH, VV)
+    GPT : path to SNAP GPT variable
     ML : multilook window size (default='1x1')
     dB : convert intensity to dB (default=False)
     overwrite : overwrite existing files (default=False)
@@ -62,7 +65,7 @@ def get_S1_intensity(
     module_path = pathlib.Path(__file__).parent.parent
     logger.debug(f'module_path: {module_path}')
 
-    # get directory where config module is installe
+    # get directory where config module is installed
     # which contains snap graphs
     config_path = pathlib.Path(S1_conf.__file__).parent
     logger.debug(f'config_path: {config_path}')
@@ -76,17 +79,17 @@ def get_S1_intensity(
     logger.debug(f'intensity:   {intensity}')
     logger.debug(f'safe_folder: {safe_folder}')
     logger.debug(f'feat_folder: {feat_folder}')
-    logger.debug(f'S1_conf.GPT: {S1_conf.GPT}')
+    logger.debug(f'GPT: {GPT}')
 
     if intensity not in ['HH', 'HV', 'VH', 'VV']:
         logger.error(f'{intensity} is not a valid choice for intensity')
         raise ValueError(f'{intensity} is not a valid choice for intensity')
 
-    if not os.path.exists(S1_conf.GPT):
-        logger.error(f'Cannot find snap GPT executable: {S1_conf.GPT}')
-        raise FileNotFoundError(f'Cannot find snap GPT executable: {S1_conf.GPT}')
+    if not os.path.exists(GPT):
+        logger.error(f'Cannot find snap GPT executable: {GPT}')
+        raise FileNotFoundError(f'Cannot find snap GPT executable: {GPT}')
 
-    if not safe_folder.is_dir():
+    if not safe_folder.exists():
         logger.error(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
         raise NotADirectoryError(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
 
@@ -199,10 +202,10 @@ def get_S1_intensity(
 # -------------------------------------------------------------------------- #
 
     # build the snap graph command
-    # needs double quotes around {S1_conf.GPT} to avoid issues with spaces in
+    # needs double quotes around {GPT} to avoid issues with spaces in
     # file names on windows
     if looks_rg>1:
-        snap_cmd = f'"{S1_conf.GPT}" ' + \
+        snap_cmd = f'"{GPT}" ' + \
             f'{snap_graph_path} ' + \
             f'-PinFile={snap_infile} ' + \
             f'-PoutFile={snap_outfile} ' + \
@@ -210,7 +213,7 @@ def get_S1_intensity(
             f'-Plooks_rg={looks_rg} ' + \
             f'-Plooks_az={looks_az}'
     else:
-        snap_cmd = f'"{S1_conf.GPT}" ' + \
+        snap_cmd = f'"{GPT}" ' + \
             f'{snap_graph_path} ' + \
             f'-PinFile={snap_infile} ' + \
             f'-PoutFile={snap_outfile} ' + \
@@ -245,6 +248,7 @@ def get_S1_intensity(
 def get_S1_IA(
     safe_folder,
     feat_folder,
+    GPT,
     overwrite=False,
     dry_run=False,
     loglevel='INFO',
@@ -256,6 +260,7 @@ def get_S1_IA(
     ----------
     safe_folder : path to S1 input image SAFE folder
     feat_folder : path to feature folder where output files are placed
+    GPT : path to SNAP GPT variable
     overwrite : overwrite existing files (default=False)
     dry_run : do not execute actual processing (default=False)
     loglevel : loglevel setting (default='INFO')
@@ -286,13 +291,13 @@ def get_S1_IA(
 
     logger.debug(f'safe_folder: {safe_folder}')
     logger.debug(f'feat_folder: {feat_folder}')
-    logger.debug(f'S1_conf.GPT: {S1_conf.GPT}')
+    logger.debug(f'GPT: {GPT}')
 
-    if not os.path.exists(S1_conf.GPT):
-        logger.error(f'Cannot find snap GPT executable: {S1_conf.GPT}')
-        raise FileNotFoundError(f'Cannot find snap GPT executable: {S1_conf.GPT}')
+    if not os.path.exists(GPT):
+        logger.error(f'Cannot find snap GPT executable: {GPT}')
+        raise FileNotFoundError(f'Cannot find snap GPT executable: {GPT}')
 
-    if not safe_folder.is_dir():
+    if not safe_folder.exists():
         logger.error(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
         raise NotADirectoryError(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
 
@@ -364,9 +369,9 @@ def get_S1_IA(
 # -------------------------------------------------------------------------- #
 
     # build the snap graph command
-    # needs double quotes around {S1_conf.GPT} to avoid issues with spaces in
+    # needs double quotes around {GPT} to avoid issues with spaces in
     # file names on windows
-    snap_cmd = f'"{S1_conf.GPT}" ' + \
+    snap_cmd = f'"{GPT}" ' + \
         f'{snap_graph_path} ' + \
         f'-PinFile={snap_infile} ' + \
         f'-PoutFile={snap_outfile}'
@@ -400,6 +405,7 @@ def get_S1_IA(
 def get_S1_lat_lon(
     safe_folder,
     feat_folder,
+    GPT,
     overwrite=False,
     dry_run=False,
     loglevel='INFO',
@@ -411,6 +417,7 @@ def get_S1_lat_lon(
     ----------
     safe_folder : path to S1 input image SAFE folder
     feat_folder : path to feature folder where output files are placed
+    GPT : path to SNAP GPT variable
     overwrite : overwrite existing files (default=False)
     dry_run : do not execute actual processing (default=False)
     loglevel : loglevel setting (default='INFO')
@@ -441,13 +448,13 @@ def get_S1_lat_lon(
 
     logger.debug(f'safe_folder: {safe_folder}')
     logger.debug(f'feat_folder: {feat_folder}')
-    logger.debug(f'S1_conf.GPT: {S1_conf.GPT}')
+    logger.debug(f'GPT: {GPT}')
 
-    if not os.path.exists(S1_conf.GPT):
-        logger.error(f'Cannot find snap GPT executable: {S1_conf.GPT}')
-        raise FileNotFoundError(f'Cannot find snap GPT executable: {S1_conf.GPT}')
+    if not os.path.exists(GPT):
+        logger.error(f'Cannot find snap GPT executable: {GPT}')
+        raise FileNotFoundError(f'Cannot find snap GPT executable: {GPT}')
 
-    if not safe_folder.is_dir():
+    if not safe_folder.exists():
         logger.error(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
         raise NotADirectoryError(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
 
@@ -530,13 +537,13 @@ def get_S1_lat_lon(
 # -------------------------------------------------------------------------- #
 
     # build the snap graph commands
-    # needs double quotes around {S1_conf.GPT} to avoid issues with spaces in
+    # needs double quotes around {GPT} to avoid issues with spaces in
     # file names on windows
-    snap_cmd_1 = f'"{S1_conf.GPT}" ' + \
+    snap_cmd_1 = f'"{GPT}" ' + \
         f'{snap_graph_path_1} ' + \
         f'-PinFile={snap_infile} ' + \
         f'-PoutFile={snap_outfile}'
-    snap_cmd_2 = f'"{S1_conf.GPT}" ' + \
+    snap_cmd_2 = f'"{GPT}" ' + \
         f'{snap_graph_path_2} ' + \
         f'-PinFile={snap_infile} ' + \
         f'-PoutFile={snap_outfile}'
@@ -623,7 +630,7 @@ def get_S1_swath_mask(
     logger.debug(f'safe_folder: {safe_folder}')
     logger.debug(f'feat_folder: {feat_folder}')
 
-    if not safe_folder.is_dir():
+    if not safe_folder.exists():
         logger.error(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
         raise NotADirectoryError(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
 
