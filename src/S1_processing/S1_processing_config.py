@@ -32,9 +32,9 @@ GPT = environ.get('GPT', '/home/jo/esa_snap/snap/bin/gpt_test')
 # with and without dB
 
 snap_S1_EW_GRDM_NR_Cal_Spk_XX    = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_Spk_XX.xml'
-snap_S1_EW_GRDM_NR_Cal_Spk_db_XX = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_Spk_dB_XX.xml'
+snap_S1_EW_GRDM_NR_Cal_Spk_dB_XX = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_Spk_dB_XX.xml'
 snap_S1_EW_GRDM_NR_Cal_XX        = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_XX.xml'
-snap_S1_EW_GRDM_NR_Cal_db_XX     = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_dB_XX.xml'
+snap_S1_EW_GRDM_NR_Cal_dB_XX     = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_dB_XX.xml'
 
 # --------- #
 
@@ -43,9 +43,9 @@ snap_S1_EW_GRDM_NR_Cal_db_XX     = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_dB_XX.xml'
 # with and without dB
 
 snap_S1_EW_GRDH_NR_Cal_Spk_XX    = 'S1_EW_GRDM/S1_EW_GRDH_NR_Cal_Spk_XX.xml'
-snap_S1_EW_GRDH_NR_Cal_Spk_db_XX = 'S1_EW_GRDM/S1_EW_GRDH_NR_Cal_Spk_dB_XX.xml'
+snap_S1_EW_GRDH_NR_Cal_Spk_dB_XX = 'S1_EW_GRDM/S1_EW_GRDH_NR_Cal_Spk_dB_XX.xml'
 snap_S1_EW_GRDH_NR_Cal_XX        = 'S1_EW_GRDM/S1_EW_GRDH_NR_Cal_XX.xml'
-snap_S1_EW_GRDH_NR_Cal_db_XX     = 'S1_EW_GRDM/S1_EW_GRDH_NR_Cal_dB_XX.xml'
+snap_S1_EW_GRDH_NR_Cal_dB_XX     = 'S1_EW_GRDM/S1_EW_GRDH_NR_Cal_dB_XX.xml'
 
 # --------- #
 
@@ -54,9 +54,9 @@ snap_S1_EW_GRDH_NR_Cal_db_XX     = 'S1_EW_GRDM/S1_EW_GRDH_NR_Cal_dB_XX.xml'
 # with and without dB
 
 snap_S1_IW_GRDH_NR_Cal_Spk_XX    = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_XX.xml'
-snap_S1_IW_GRDH_NR_Cal_Spk_db_XX = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_dB_XX.xml'
+snap_S1_IW_GRDH_NR_Cal_Spk_dB_XX = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_dB_XX.xml'
 snap_S1_IW_GRDH_NR_Cal_XX        = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_XX.xml'
-snap_S1_IW_GRDH_NR_Cal_db_XX     = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_dB_XX.xml'
+snap_S1_IW_GRDH_NR_Cal_dB_XX     = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_dB_XX.xml'
 
 # --------- #
 
@@ -81,10 +81,10 @@ snap_S1_EW_GRDM_NR_Cal_Spk_HV    = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_Spk_HV.xml'
 snap_S1_EW_GRDM_NR_Cal_Spk_VH    = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_Spk_VH.xml'
 
 # EW_GRDM in dB
-snap_S1_EW_GRDM_NR_Cal_Spk_db_HH = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_Spk_dB_HH.xml'
-snap_S1_EW_GRDM_NR_Cal_Spk_db_VV = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_Spk_dB_VV.xml'
-snap_S1_EW_GRDM_NR_Cal_Spk_db_HV = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_Spk_dB_HV.xml'
-snap_S1_EW_GRDM_NR_Cal_Spk_db_VH = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_Spk_dB_VH.xml'
+snap_S1_EW_GRDM_NR_Cal_Spk_dB_HH = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_Spk_dB_HH.xml'
+snap_S1_EW_GRDM_NR_Cal_Spk_dB_VV = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_Spk_dB_VV.xml'
+snap_S1_EW_GRDM_NR_Cal_Spk_dB_HV = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_Spk_dB_HV.xml'
+snap_S1_EW_GRDM_NR_Cal_Spk_dB_VH = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_Spk_dB_VH.xml'
 
 # EW_GRDH
 snap_S1_EW_GRDH_NR_Cal_Spk_HH    = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_Spk_HH.xml'
@@ -92,11 +92,11 @@ snap_S1_EW_GRDH_NR_Cal_Spk_VV    = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_Spk_VV.xml'
 snap_S1_EW_GRDH_NR_Cal_Spk_HV    = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_Spk_HV.xml'
 snap_S1_EW_GRDH_NR_Cal_Spk_VH    = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_Spk_VH.xml'
 
-# EW_GRDH in db
-snap_S1_EW_GRDH_NR_Cal_Spk_db_HH = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_Spk_dB_HH.xml'
-snap_S1_EW_GRDH_NR_Cal_Spk_db_VV = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_Spk_dB_VV.xml'
-snap_S1_EW_GRDH_NR_Cal_Spk_db_HV = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_Spk_dB_HV.xml'
-snap_S1_EW_GRDH_NR_Cal_Spk_db_VH = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_Spk_dB_VH.xml'
+# EW_GRDH in dB
+snap_S1_EW_GRDH_NR_Cal_Spk_dB_HH = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_Spk_dB_HH.xml'
+snap_S1_EW_GRDH_NR_Cal_Spk_dB_VV = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_Spk_dB_VV.xml'
+snap_S1_EW_GRDH_NR_Cal_Spk_dB_HV = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_Spk_dB_HV.xml'
+snap_S1_EW_GRDH_NR_Cal_Spk_dB_VH = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_Spk_dB_VH.xml'
 
 # IW_GRDH
 snap_S1_IW_GRDH_NR_Cal_Spk_HH    = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_HH.xml'
@@ -105,10 +105,10 @@ snap_S1_IW_GRDH_NR_Cal_Spk_HV    = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_HV.xml'
 snap_S1_IW_GRDH_NR_Cal_Spk_VH    = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_VH.xml'
 
 # IW_GRDH in dB
-snap_S1_IW_GRDH_NR_Cal_Spk_db_HH = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_dB_HH.xml'
-snap_S1_IW_GRDH_NR_Cal_Spk_db_VV = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_dB_VV.xml'
-snap_S1_IW_GRDH_NR_Cal_Spk_db_HV = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_dB_HV.xml'
-snap_S1_IW_GRDH_NR_Cal_Spk_db_VH = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_dB_VH.xml'
+snap_S1_IW_GRDH_NR_Cal_Spk_dB_HH = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_dB_HH.xml'
+snap_S1_IW_GRDH_NR_Cal_Spk_dB_VV = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_dB_VV.xml'
+snap_S1_IW_GRDH_NR_Cal_Spk_dB_HV = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_dB_HV.xml'
+snap_S1_IW_GRDH_NR_Cal_Spk_dB_VH = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_Spk_dB_VH.xml'
 
 
 # graphs with no ML (Spk)
@@ -120,10 +120,10 @@ snap_S1_EW_GRDM_NR_Cal_HV      = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_HV.xml'
 snap_S1_EW_GRDM_NR_Cal_VH      = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_VH.xml'
 
 # EW_GRDM in dB
-snap_S1_EW_GRDM_NR_Cal_db_HH   = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_dB_HH.xml'
-snap_S1_EW_GRDM_NR_Cal_db_VV   = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_dB_VV.xml'
-snap_S1_EW_GRDM_NR_Cal_db_HV   = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_dB_HV.xml'
-snap_S1_EW_GRDM_NR_Cal_db_VH   = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_dB_VH.xml'
+snap_S1_EW_GRDM_NR_Cal_dB_HH   = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_dB_HH.xml'
+snap_S1_EW_GRDM_NR_Cal_dB_VV   = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_dB_VV.xml'
+snap_S1_EW_GRDM_NR_Cal_dB_HV   = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_dB_HV.xml'
+snap_S1_EW_GRDM_NR_Cal_dB_VH   = 'S1_EW_GRDM/S1_EW_GRDM_NR_Cal_dB_VH.xml'
 
 # EW_GRDH
 snap_S1_EW_GRDH_NR_Cal_HH      = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_HH.xml'
@@ -132,10 +132,10 @@ snap_S1_EW_GRDH_NR_Cal_HV      = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_HV.xml'
 snap_S1_EW_GRDH_NR_Cal_VH      = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_VH.xml'
 
 # EW_GRDH in dB
-snap_S1_EW_GRDH_NR_Cal_db_HH   = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_dB_HH.xml'
-snap_S1_EW_GRDH_NR_Cal_db_VV   = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_dB_VV.xml'
-snap_S1_EW_GRDH_NR_Cal_db_HV   = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_dB_HV.xml'
-snap_S1_EW_GRDH_NR_Cal_db_VH   = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_dB_VH.xml'
+snap_S1_EW_GRDH_NR_Cal_dB_HH   = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_dB_HH.xml'
+snap_S1_EW_GRDH_NR_Cal_dB_VV   = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_dB_VV.xml'
+snap_S1_EW_GRDH_NR_Cal_dB_HV   = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_dB_HV.xml'
+snap_S1_EW_GRDH_NR_Cal_dB_VH   = 'S1_EW_GRDH/S1_EW_GRDH_NR_Cal_dB_VH.xml'
 
 # IW_GRDH
 snap_S1_IW_GRDH_NR_Cal_HH      = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_HH.xml'
@@ -144,10 +144,10 @@ snap_S1_IW_GRDH_NR_Cal_HV      = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_HV.xml'
 snap_S1_IW_GRDH_NR_Cal_VH      = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_VH.xml'
 
 # EW_GRDH in dB
-snap_S1_IW_GRDH_NR_Cal_db_HH   = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_dB_HH.xml'
-snap_S1_IW_GRDH_NR_Cal_db_VV   = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_dB_VV.xml'
-snap_S1_IW_GRDH_NR_Cal_db_HV   = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_dB_HV.xml'
-snap_S1_IW_GRDH_NR_Cal_db_VH   = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_dB_VH.xml'
+snap_S1_IW_GRDH_NR_Cal_dB_HH   = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_dB_HH.xml'
+snap_S1_IW_GRDH_NR_Cal_dB_VV   = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_dB_VV.xml'
+snap_S1_IW_GRDH_NR_Cal_dB_HV   = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_dB_HV.xml'
+snap_S1_IW_GRDH_NR_Cal_dB_VH   = 'S1_IW_GRDH/S1_IW_GRDH_NR_Cal_dB_VH.xml'
 """
 
 # -------------------------------------------------------------------------- #

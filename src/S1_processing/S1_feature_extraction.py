@@ -10,6 +10,8 @@ import sys
 import pathlib
 import shutil
 
+import zipfile
+
 from loguru import logger
 
 import numpy as np
@@ -26,7 +28,7 @@ import S1_processing.utils as S1_utils
 # -------------------------------------------------------------------------- #
 
 def get_S1_intensity(
-    safe_folder,
+    S1_safe_zip,
     feat_folder,
     intensity,
     GPT,
@@ -41,10 +43,10 @@ def get_S1_intensity(
 
     Parameters
     ----------
-    safe_folder : path to S1 input image SAFE folder
+    S1_safe_zip : path to S1 input image SAFE folder or zip file
     feat_folder : path to feature folder where output files are placed
     intensity : intensity band to extract (HH, HV, VH, VV)
-    GPT : path to SNAP GPT variable
+    GPT : path to SNAP GPT executable
     ML : multilook window size (default='1x1')
     dB : convert intensity to dB (default=False)
     overwrite : overwrite existing files (default=False)
@@ -73,53 +75,62 @@ def get_S1_intensity(
 # -------------------------------------------------------------------------- #
 
     # convert folder strings to paths
-    safe_folder = pathlib.Path(safe_folder).expanduser().absolute()
+    S1_safe_zip = pathlib.Path(S1_safe_zip).expanduser().absolute()
     feat_folder = pathlib.Path(feat_folder).expanduser().absolute()
 
     logger.debug(f'intensity:   {intensity}')
-    logger.debug(f'safe_folder: {safe_folder}')
+    logger.debug(f'S1_safe_zip: {S1_safe_zip}')
     logger.debug(f'feat_folder: {feat_folder}')
     logger.debug(f'GPT: {GPT}')
 
     if intensity not in ['HH', 'HV', 'VH', 'VV']:
         logger.error(f'{intensity} is not a valid choice for intensity')
-        raise ValueError(f'{intensity} is not a valid choice for intensity')
+        return False
 
     if not os.path.exists(GPT):
         logger.error(f'Cannot find snap GPT executable: {GPT}')
-        raise FileNotFoundError(f'Cannot find snap GPT executable: {GPT}')
+        return False
 
-    if not safe_folder.exists():
-        logger.error(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
-        raise NotADirectoryError(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
+    if not S1_safe_zip.exists():
+        logger.error(f'Cannot find Sentinel-1 SAFE folder or zip file: {S1_safe_zip}')
+        return False
 
-    # get S1 basename from safe_folder
-    f_base = safe_folder.stem
+    # get S1 basename from S1_safe_zip
+    S1_base = S1_safe_zip.stem
+
+    # get S1 input file type
+    S1_file_type = S1_safe_zip.suffix.lstrip('.')
 
     # build datestring
-    date, datetime, datestring = S1_info.get_S1_datestring(f_base)
+    date, datetime, datestring = S1_info.get_S1_datestring(S1_base)
 
     # get product mode and type
-    p_mode, p_type, p_pol = S1_info.get_S1_product_info(f_base)
+    p_mode, p_type, p_pol = S1_info.get_S1_product_info(S1_base)
 
-    logger.debug(f'f_base:     {f_base}')
-    logger.debug(f'date:       {date}')
-    logger.debug(f'datetime:   {datetime}')
-    logger.debug(f'datestring: {datestring}')
-    logger.debug(f'p_mode:     {p_mode}')
-    logger.debug(f'p_type:     {p_type}')
-    logger.debug(f'p_pol:      {p_pol}')
+    logger.debug(f'S1_base:      {S1_base}')
+    logger.debug(f'S1_file_type: {S1_file_type}')
+    logger.debug(f'date:         {date}')
+    logger.debug(f'datetime:     {datetime}')
+    logger.debug(f'datestring:   {datestring}')
+    logger.debug(f'p_mode:       {p_mode}')
+    logger.debug(f'p_type:       {p_type}')
+    logger.debug(f'p_pol:        {p_pol}')
 
     # check that product mode contains correct polarisation
     if not intensity in p_pol:
         logger.error(f'Product mode does not contain {intensity} polarisation')
-        raise NameError(f'Product mode does not contain {intensity} polarisation')
+        return False
+
+    # check that S1_file_type is SAFE or zip
+    if not S1_file_type in ['SAFE', 'zip']:
+        logger.error("1_safe_zip must be a 'SAFE' folder or 'zip' file")
+        return False
 
 # -------------------------------------------------------------------------- #
 
-    # build db_str for output file name and define outfile_basename
-    db_str = '_db' if dB else ''
-    outfile_basename = f'Sigma0_{intensity}{db_str}'
+    # build dB_str for output file name and define outfile_basename
+    dB_str = '_dB' if dB else ''
+    outfile_basename = f'Sigma0_{intensity}{dB_str}'
 
     # define output file name and path
     img_path = feat_folder / f'{outfile_basename}.img'
@@ -131,7 +142,7 @@ def get_S1_intensity(
     # check if outfile already exists
     if img_path.is_file() and not overwrite:
         logger.info('Output file already exists, use `-overwrite` to force')
-        return 
+        return True
 
     # create feat_folder if needed
     feat_folder.mkdir(parents=True, exist_ok=True)
@@ -152,26 +163,21 @@ def get_S1_intensity(
     except:
         logger.error(f'Cannot extract looks_rg and looks_az from ML parameter: {ML}')
         logger.error(f'Expected format for ML argument: looks_rgxlooks_az')
-        raise ValueError(f'Cannot extract looks_rg and looks_az from ML parameter: {ML}')
+        return False
 
     logger.debug(f'looks_rg: {looks_rg}')
     logger.debug(f'looks_az: {looks_az}')
 
     if looks_rg%2==0 or looks_az%2==0:
-        logger.error(
-          'looks_rg and looks_az must be odd numbers'
-        )
-        raise ValueError(
-            f'looks_rg and looks_az must be odd numbers'
-        )
+        logger.error('looks_rg and looks_az must be odd numbers')
+        return False
 
 # -------------------------------------------------------------------------- #
 
     # build look_str for snap_graph_file name
     # build snap_graph_string
     look_str = '_Spk' if looks_rg>1 else ''
-    snap_graph_string = \
-        f'S1_conf.snap_S1_{p_mode}_{p_type}_NR_Cal{look_str}{db_str}_XX'
+    snap_graph_string = f'S1_conf.snap_S1_{p_mode}_{p_type}_NR_Cal{look_str}{dB_str}_XX'
 
     logger.debug(f'snap_graph_string: {snap_graph_string}')
 
@@ -181,13 +187,13 @@ def get_S1_intensity(
     except:
         logger.error('Given product mode and settings not implemented yet')
         logger.error(f'S1_processing_config has no attribute: {snap_graph_string}')
-        raise NotImplementedError(f'Given product mode and settings not implemented yet')
+        return False
 
     # build snap_graph_path
     snap_graph_path = config_path / 'snap_graphs' / snap_graph_file
 
     # set snap input and output files
-    snap_infile  = safe_folder
+    snap_infile  = S1_safe_zip
     snap_outfile = tmp_folder / 'tmp.dim'
 
     logger.debug(f'snap_graph_path: {snap_graph_path}')
@@ -197,7 +203,7 @@ def get_S1_intensity(
     # check that snap_graph_path exists
     if not snap_graph_path.is_file():
         logger.error(f'Cannot find snap_graph_path: {snap_graph_path}')
-        raise FileNotFoundError(f'Cannot find snap_graph_path: {snap_graph_path}')
+        return False
 
 # -------------------------------------------------------------------------- #
 
@@ -226,7 +232,7 @@ def get_S1_intensity(
     if dry_run:
         logger.info('Dry-run (not performing actual processing)')
         shutil.rmtree(tmp_folder)
-        return 
+        return True
 
 
     # system call snap_command
@@ -239,6 +245,8 @@ def get_S1_intensity(
     # remove snap tmp_dir
     shutil.rmtree(tmp_folder)
 
+    return True
+
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #
@@ -246,7 +254,7 @@ def get_S1_intensity(
 # -------------------------------------------------------------------------- #
 
 def get_S1_IA(
-    safe_folder,
+    S1_safe_zip,
     feat_folder,
     GPT,
     overwrite=False,
@@ -258,7 +266,7 @@ def get_S1_IA(
 
     Parameters
     ----------
-    safe_folder : path to S1 input image SAFE folder
+    S1_safe_zip : path to S1 input image SAFE folder
     feat_folder : path to feature folder where output files are placed
     GPT : path to SNAP GPT variable
     overwrite : overwrite existing files (default=False)
@@ -286,37 +294,46 @@ def get_S1_IA(
 # -------------------------------------------------------------------------- #
 
     # convert folder strings to paths
-    safe_folder = pathlib.Path(safe_folder).expanduser().absolute()
+    S1_safe_zip = pathlib.Path(S1_safe_zip).expanduser().absolute()
     feat_folder = pathlib.Path(feat_folder).expanduser().absolute()
 
-    logger.debug(f'safe_folder: {safe_folder}')
+    logger.debug(f'S1_safe_zip: {S1_safe_zip}')
     logger.debug(f'feat_folder: {feat_folder}')
     logger.debug(f'GPT: {GPT}')
 
     if not os.path.exists(GPT):
         logger.error(f'Cannot find snap GPT executable: {GPT}')
-        raise FileNotFoundError(f'Cannot find snap GPT executable: {GPT}')
+        return False
 
-    if not safe_folder.exists():
-        logger.error(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
-        raise NotADirectoryError(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
+    if not S1_safe_zip.exists():
+        logger.error(f'Cannot find Sentinel-1 SAFE folder: {S1_safe_zip}')
+        return False
 
-    # get S1 basename from safe_folder
-    f_base = safe_folder.stem
+    # get S1 basename from S1_safe_zip
+    S1_base = S1_safe_zip.stem
+
+    # get S1 input type
+    S1_file_type = S1_safe_zip.suffix.lstrip('.')
 
     # build datestring
-    date, datetime, datestring = S1_info.get_S1_datestring(f_base)
+    date, datetime, datestring = S1_info.get_S1_datestring(S1_base)
 
     # get product mode and type
-    p_mode, p_type, p_pol = S1_info.get_S1_product_info(f_base)
+    p_mode, p_type, p_pol = S1_info.get_S1_product_info(S1_base)
 
-    logger.debug(f'f_base:     {f_base}')
-    logger.debug(f'date:       {date}')
-    logger.debug(f'datetime:   {datetime}')
-    logger.debug(f'datestring: {datestring}')
-    logger.debug(f'p_mode:     {p_mode}')
-    logger.debug(f'p_type:     {p_type}')
-    logger.debug(f'p_pol:      {p_pol}')
+    logger.debug(f'S1_base:      {S1_base}')
+    logger.debug(f'S1_file_type: {S1_file_type}')
+    logger.debug(f'date:         {date}')
+    logger.debug(f'datetime:     {datetime}')
+    logger.debug(f'datestring:   {datestring}')
+    logger.debug(f'p_mode:       {p_mode}')
+    logger.debug(f'p_type:       {p_type}')
+    logger.debug(f'p_pol:        {p_pol}')
+
+    # check that S1_file_type is SAFE or zip
+    if not S1_file_type in ['SAFE', 'zip']:
+        logger.error("1_safe_zip must be a 'SAFE' folder or 'zip' file")
+        return False
 
 # -------------------------------------------------------------------------- #
 
@@ -333,7 +350,7 @@ def get_S1_IA(
     # check if outfile already exists
     if img_path.is_file() and not overwrite:
         logger.info('Output file already exists, use `-overwrite` to force')
-        return 
+        return True
 
     # create feat_folder if needed
     feat_folder.mkdir(parents=True, exist_ok=True)
@@ -354,7 +371,7 @@ def get_S1_IA(
     snap_graph_path = config_path / 'snap_graphs' / snap_graph_file
 
     # set snap input and output files
-    snap_infile  = safe_folder
+    snap_infile  = S1_safe_zip
     snap_outfile = tmp_folder / 'tmp.dim'
 
     logger.debug(f'snap_graph_path: {snap_graph_path}')
@@ -364,7 +381,7 @@ def get_S1_IA(
     # check that snap_graph_path exists
     if not snap_graph_path.is_file():
         logger.error(f'Cannot find snap_graph_path: {snap_graph_path}')
-        raise FileNotFoundError(f'Cannot find snap_graph_path: {snap_graph_path}')
+        return False
 
 # -------------------------------------------------------------------------- #
 
@@ -383,7 +400,7 @@ def get_S1_IA(
     if dry_run:
         logger.info('Dry-run - not performing actual processing')
         shutil.rmtree(tmp_folder)
-        return 
+        return True
 
 
     # system call snap_command
@@ -396,6 +413,8 @@ def get_S1_IA(
     # remove snap tmp_dir
     shutil.rmtree(tmp_folder)
 
+    return True
+
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #
@@ -403,7 +422,7 @@ def get_S1_IA(
 # -------------------------------------------------------------------------- #
 
 def get_S1_lat_lon(
-    safe_folder,
+    S1_safe_zip,
     feat_folder,
     GPT,
     overwrite=False,
@@ -415,7 +434,7 @@ def get_S1_lat_lon(
 
     Parameters
     ----------
-    safe_folder : path to S1 input image SAFE folder
+    S1_safe_zip : path to S1 input image SAFE folder
     feat_folder : path to feature folder where output files are placed
     GPT : path to SNAP GPT variable
     overwrite : overwrite existing files (default=False)
@@ -443,37 +462,46 @@ def get_S1_lat_lon(
 # -------------------------------------------------------------------------- #
 
     # convert folder strings to paths
-    safe_folder = pathlib.Path(safe_folder).expanduser().absolute()
+    S1_safe_zip = pathlib.Path(S1_safe_zip).expanduser().absolute()
     feat_folder = pathlib.Path(feat_folder).expanduser().absolute()
 
-    logger.debug(f'safe_folder: {safe_folder}')
+    logger.debug(f'S1_safe_zip: {S1_safe_zip}')
     logger.debug(f'feat_folder: {feat_folder}')
     logger.debug(f'GPT: {GPT}')
 
     if not os.path.exists(GPT):
         logger.error(f'Cannot find snap GPT executable: {GPT}')
-        raise FileNotFoundError(f'Cannot find snap GPT executable: {GPT}')
+        return False
 
-    if not safe_folder.exists():
-        logger.error(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
-        raise NotADirectoryError(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
+    if not S1_safe_zip.exists():
+        logger.error(f'Cannot find Sentinel-1 SAFE folder: {S1_safe_zip}')
+        return False
 
-    # get S1 basename from safe_folder
-    f_base = safe_folder.stem
+    # get S1 basename from S1_safe_zip
+    S1_base = S1_safe_zip.stem
+
+    # get S1 input type
+    S1_file_type = S1_safe_zip.suffix.lstrip('.')
 
     # build datestring
-    date, datetime, datestring = S1_info.get_S1_datestring(f_base)
+    date, datetime, datestring = S1_info.get_S1_datestring(S1_base)
 
     # get product mode and type
-    p_mode, p_type, p_pol = S1_info.get_S1_product_info(f_base)
+    p_mode, p_type, p_pol = S1_info.get_S1_product_info(S1_base)
 
-    logger.debug(f'f_base:     {f_base}')
-    logger.debug(f'date:       {date}')
-    logger.debug(f'datetime:   {datetime}')
-    logger.debug(f'datestring: {datestring}')
-    logger.debug(f'p_mode:     {p_mode}')
-    logger.debug(f'p_type:     {p_type}')
-    logger.debug(f'p_pol:      {p_pol}')
+    logger.debug(f'S1_base:      {S1_base}')
+    logger.debug(f'S1_file_type: {S1_file_type}')
+    logger.debug(f'date:         {date}')
+    logger.debug(f'datetime:     {datetime}')
+    logger.debug(f'datestring:   {datestring}')
+    logger.debug(f'p_mode:       {p_mode}')
+    logger.debug(f'p_type:       {p_type}')
+    logger.debug(f'p_pol:        {p_pol}')
+
+    # check that S1_file_type is SAFE or zip
+    if not S1_file_type in ['SAFE', 'zip']:
+        logger.error("1_safe_zip must be a 'SAFE' folder or 'zip' file")
+        return False
 
 # -------------------------------------------------------------------------- #
 
@@ -518,7 +546,7 @@ def get_S1_lat_lon(
     snap_graph_path_2 = config_path / 'snap_graphs' / snap_graph_file_2
 
     # set snap input and output files
-    snap_infile  = safe_folder
+    snap_infile  = S1_safe_zip
     snap_outfile = tmp_folder / 'tmp.dim'
 
     logger.debug(f'snap_graph_path_1: {snap_graph_path_1}')
@@ -588,7 +616,7 @@ def get_S1_lat_lon(
 # -------------------------------------------------------------------------- #
 
 def get_S1_swath_mask(
-    safe_folder,
+    S1_safe_zip,
     feat_folder,
     overwrite=False,
     loglevel='INFO',
@@ -598,7 +626,7 @@ def get_S1_swath_mask(
 
     Parameters
     ----------
-    safe_folder : path to S1 input image SAFE folder
+    S1_safe_zip : path to S1 input image SAFE folder
     feat_folder : path to feature folder where output files are placed
     overwrite : overwrite existing files (default=False)
     loglevel : loglevel setting (default='INFO')
@@ -624,32 +652,41 @@ def get_S1_swath_mask(
 # -------------------------------------------------------------------------- #
 
     # convert folder strings to paths
-    safe_folder = pathlib.Path(safe_folder).expanduser().absolute()
+    S1_safe_zip = pathlib.Path(S1_safe_zip).expanduser().absolute()
     feat_folder = pathlib.Path(feat_folder).expanduser().absolute()
 
-    logger.debug(f'safe_folder: {safe_folder}')
+    logger.debug(f'S1_safe_zip: {S1_safe_zip}')
     logger.debug(f'feat_folder: {feat_folder}')
 
-    if not safe_folder.exists():
-        logger.error(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
-        raise NotADirectoryError(f'Cannot find Sentinel-1 SAFE folder: {safe_folder}')
+    if not S1_safe_zip.exists():
+        logger.error(f'Cannot find Sentinel-1 SAFE folder: {S1_safe_zip}')
+        return False
 
-    # get S1 basename from safe_folder
-    f_base = safe_folder.stem
+    # get S1 basename from S1_safe_zip
+    S1_base = S1_safe_zip.stem
+
+    # get S1 input type
+    S1_file_type = S1_safe_zip.suffix.lstrip('.')
 
     # build datestring
-    date, datetime, datestring = S1_info.get_S1_datestring(f_base)
+    date, datetime, datestring = S1_info.get_S1_datestring(S1_base)
 
     # get product mode and type
-    p_mode, p_type, p_pol = S1_info.get_S1_product_info(f_base)
+    p_mode, p_type, p_pol = S1_info.get_S1_product_info(S1_base)
 
-    logger.debug(f'f_base:     {f_base}')
-    logger.debug(f'date:       {date}')
-    logger.debug(f'datetime:   {datetime}')
-    logger.debug(f'datestring: {datestring}')
-    logger.debug(f'p_mode:     {p_mode}')
-    logger.debug(f'p_type:     {p_type}')
-    logger.debug(f'p_pol:      {p_pol}')
+    logger.debug(f'S1_base:      {S1_base}')
+    logger.debug(f'S1_file_type: {S1_file_type}')
+    logger.debug(f'date:         {date}')
+    logger.debug(f'datetime:     {datetime}')
+    logger.debug(f'datestring:   {datestring}')
+    logger.debug(f'p_mode:       {p_mode}')
+    logger.debug(f'p_type:       {p_type}')
+    logger.debug(f'p_pol:        {p_pol}')
+
+    # check that S1_file_type is SAFE or zip
+    if not S1_file_type in ['SAFE', 'zip']:
+        logger.error("1_safe_zip must be a 'SAFE' folder or 'zip' file")
+        return False
 
 # -------------------------------------------------------------------------- #
 
@@ -666,7 +703,7 @@ def get_S1_swath_mask(
     # check if outfile already exists
     if img_path.is_file() and not overwrite:
         logger.info('Output file already exists, use `-overwrite` to force')
-        return 
+        return True
 
     # create feat_folder if needed
     feat_folder.mkdir(parents=True, exist_ok=True)
@@ -674,7 +711,47 @@ def get_S1_swath_mask(
 # -------------------------------------------------------------------------- #
 
     # define manifest_path
-    manifest_path = safe_folder / 'manifest.safe'
+    if S1_file_type == 'SAFE':
+        logger.debug("S1 input is a SAFE folder, building path to 'manifest.safe' inside SAFE folder")
+        manifest_path = S1_safe_zip / 'manifest.safe'
+    elif S1_file_type == 'zip':
+        logger.debug("S1 input is a zip file, building path to 'manifest.safe' inside zip file")
+
+        # create tmp dir for snap output
+        tmp_folder = feat_folder.parent / 'tmp'
+        if tmp_folder.is_dir():
+            logger.debug('Removing existing tmp_folder')
+            shutil.rmtree(tmp_folder)
+        tmp_folder.mkdir(exist_ok=False)
+
+        # extract manifest.safe from zip folder
+        with zipfile.ZipFile(S1_safe_zip, 'r') as zip_ref:
+            zip_content = zip_ref.namelist()
+            manifest_in_zip = next((f for f in zip_content if 'manifest.safe' in f), None)
+            annotation_in_zip = next((f for f in zip_content if'/annotation/s1' in f and p_pol[0].lower() in f), None)
+
+            if annotation_in_zip in zip_ref.namelist():
+                zip_ref.extract(annotation_in_zip, tmp_folder)
+                logger.debug(f"Extracted annotation file from current zip file to temp file")
+                annotation_path = tmp_folder / f"{S1_safe_zip.stem}.SAFE" / "annotation" / pathlib.Path(annotation_in_zip).name
+            else:
+                logger.error("Did not find annotation file in S1 zip folder")
+                return False
+
+            if manifest_in_zip in zip_ref.namelist():
+                zip_ref.extract(manifest_in_zip, tmp_folder)
+                logger.debug(f"Extracted manifest.safe from current zip file to temp file")
+                manifest_path = tmp_folder / f"{S1_safe_zip.stem}.SAFE" / "manifest.safe"
+            else:
+                logger.error("Did not find 'manifest.safe in S1 zip folder")
+                return False
+    
+    logger.debug(f"manifest_path:   {manifest_path}")
+    logger.debug(f"annotation_path: {annotation_path}")
+
+    if not manifest_path.is_file() or not annotation_path.is_file():
+        logger.error("Extraction from S1 zip file failed")
+        return False
 
     # define swath names
     if p_mode == 'EW':
@@ -683,7 +760,7 @@ def get_S1_swath_mask(
         swaths = ["IW1", "IW2", "IW3"]
     else:
         logger.error(f'Acquisition mode {p_mode} not implemented yet')
-        raise NotImplementedError(f'Given product mode and settings not implemented yet')
+        return False
 
     # get number of swaths
     number_of_swaths = len(swaths)
@@ -695,9 +772,7 @@ def get_S1_swath_mask(
         if swath_number == 1:
             swath_mask = S1_sm.get_swath_mask(manifest_path, swath_name, p_pol[0])
         else:
-            swath_mask = swath_mask + (swath_number) * S1_sm.get_swath_mask(
-                manifest_path, swath_name, p_pol[0]
-            )
+            swath_mask = swath_mask + (swath_number) * S1_sm.get_swath_mask(manifest_path, swath_name, p_pol[0])
 
 # -------------------------------------------------------------------------- #
 
@@ -705,15 +780,15 @@ def get_S1_swath_mask(
 
     # delete output file if it exists
     if img_path.is_file() and overwrite:
-        logger.info('Remving existing output file')
+        logger.info('Removing existing output file')
         os.remove(img_path.as_posix())
         os.remove(os.path.splitext(img_path.as_posix())[0]+'.hdr')
 
     # get dimensions
-    Ny, Nx    = swath_mask.shape
+    Ny, Nx = swath_mask.shape
 
     # set number of bands and data type
-    bands     = 1
+    bands = 1
     data_type =gdal.GDT_Byte
     
     # get driver
@@ -727,8 +802,13 @@ def get_S1_swath_mask(
 
     # write to file
     output.GetRasterBand(1).WriteArray(swath_mask)
-
     output.FlushCache()
+
+    # remove snap tmp_dir and create again empty
+    if tmp_folder.is_dir():
+        shutil.rmtree(tmp_folder)
+
+    return True
 
 # -------------------------------------------------------------------------- #
 # -------------------------------------------------------------------------- #
@@ -818,16 +898,16 @@ def make_S1_rgb(
         logger.error(f'Cannot find feat_folder: {feat_folder}')
         raise NotADirectoryError(f'Cannot find feat_folder: {feat_folder}')
 
-    # get S1 basename from safe_folder
-    f_base = feat_folder.stem
+    # get S1 basename from S1_safe_zip
+    S1_base = feat_folder.stem
 
     # build datestring
-    date, datetime, datestring = S1_info.get_S1_datestring(f_base)
+    date, datetime, datestring = S1_info.get_S1_datestring(S1_base)
 
     # get product mode and type
-    p_mode, p_type, p_pol = S1_info.get_S1_product_info(f_base)
+    p_mode, p_type, p_pol = S1_info.get_S1_product_info(S1_base)
 
-    logger.debug(f'f_base:     {f_base}')
+    logger.debug(f'S1_base:     {S1_base}')
     logger.debug(f'date:       {date}')
     logger.debug(f'datetime:   {datetime}')
     logger.debug(f'datestring: {datestring}')
@@ -838,14 +918,14 @@ def make_S1_rgb(
 # -------------------------------------------------------------------------- #
 
     # define output file name and path
-    img_path = result_folder / f'{f_base}_rgb.tif'
+    img_path = result_folder / f'{S1_base}_rgb.tif'
 
     logger.debug(f'img_path: {img_path}')
 
     # check if outfile already exists
     if img_path.is_file() and not overwrite:
         logger.info('Output file already exists, use `-overwrite` to force')
-        return 
+        return True
 
     # create result_folder if needed
     result_folder.mkdir(parents=True, exist_ok=True)
@@ -884,19 +964,19 @@ def make_S1_rgb(
 
     # convert to dB
     logger.info('Converting HH and HV to dB')
-    HH_db = 10*np.log10(HH)
-    HV_db = 10*np.log10(HV)
+    HH_dB = 10*np.log10(HH)
+    HV_dB = 10*np.log10(HV)
 
     # clip to min and max
-    HH_db[HH_db<hhMin] = hhMin
-    HH_db[HH_db>hhMax] = hhMax
-    HV_db[HV_db<hvMin] = hvMin
-    HV_db[HV_db>hvMax] = hvMax
+    HH_dB[HH_dB<hhMin] = hhMin
+    HH_dB[HH_dB>hhMax] = hhMax
+    HV_dB[HV_dB<hvMin] = hvMin
+    HV_dB[HV_dB>hvMax] = hvMax
 
     # scale both channels
     logger.info('Scaling HH and HV channel individually')
-    HH_scaled = (HH_db - (hhMin)) * ((newMax - newMin) / ((hhMax) - (hhMin))) + newMin
-    HV_scaled = (HV_db - (hvMin)) * ((newMax - newMin) / ((hvMax) - (hvMin))) + newMin
+    HH_scaled = (HH_dB - (hhMin)) * ((newMax - newMin) / ((hhMax) - (hhMin))) + newMin
+    HV_scaled = (HV_dB - (hvMin)) * ((newMax - newMin) / ((hvMax) - (hvMin))) + newMin
 
     # assign to RGB channels
     if red == 'HV':
@@ -904,21 +984,21 @@ def make_S1_rgb(
     elif red == 'HH':
         r = HH_scaled
     elif red == 'zero':
-        r = np.zeros(HH_db.shape)
+        r = np.zeros(HH_dB.shape)
 
     if green == 'HV':
         g = HV_scaled
     elif green == 'HH':
         g = HH_scaled
     elif green == 'zero':
-        g = np.zeros(HH_db.shape)
+        g = np.zeros(HH_dB.shape)
 
     if blue == 'HV':
         b = HV_scaled
     elif blue == 'HH':
         b = HH_scaled
     elif blue == 'zero':
-        b = np.zeros(HH_db.shape)
+        b = np.zeros(HH_dB.shape)
 
     logger.info(f'Stacking to RGB: red:{red}, green:{green}, blue:{blue}')
 

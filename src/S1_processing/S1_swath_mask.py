@@ -65,9 +65,7 @@ def get_swath_mask(manifest_path, swath, polarization):
   assert polarization.upper() in ['HH', 'HV', 'VH', 'VV'], \
     'Not a valid input polarisation.'
 
-  annotation_path = annotation_path_from_manifest_path(
-    manifest_path, polarization.lower()
-  )
+  annotation_path = annotation_path_from_manifest_path(manifest_path, polarization.lower())
 
   with open(annotation_path, 'r') as f:
     xml = etree.parse(f)
@@ -77,9 +75,7 @@ def get_swath_mask(manifest_path, swath, polarization):
 
   mask = zeros((rows, cols), dtype=uint8)
 
-  swathBoundsXml = xml.xpath(
-    '//*/swathBounds[../../swath/text() = "{swath}"]'.format(swath=swath)
-  )
+  swathBoundsXml = xml.xpath('//*/swathBounds[../../swath/text() = "{swath}"]'.format(swath=swath))
 
   for sb_xml in swathBoundsXml:
     y1 = int(sb_xml.xpath('firstAzimuthLine')[0].text)
