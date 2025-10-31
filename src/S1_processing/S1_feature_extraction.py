@@ -129,8 +129,9 @@ def get_S1_intensity(
 # -------------------------------------------------------------------------- #
 
     # build dB_str for output file name and define outfile_basename
-    dB_str = '_db' if dB else ''
+    dB_str = '_dB' if dB else ''
     outfile_basename = f'Sigma0_{intensity}{dB_str}'
+    outfile_basename_from_snap = f'Sigma0_{intensity}{dB_str.lower()}'
 
     # define output file name and path
     img_path = feat_folder / f'{outfile_basename}.img'
@@ -239,8 +240,8 @@ def get_S1_intensity(
     os.system(snap_cmd)
 
     # copy image files to feat_folder
-    shutil.copyfile(tmp_folder / 'tmp.data' / f'{outfile_basename}.img', img_path)
-    shutil.copyfile(tmp_folder / 'tmp.data' / f'{outfile_basename}.hdr', hdr_path)
+    shutil.copyfile(tmp_folder / 'tmp.data' / f'{outfile_basename_from_snap}.img', img_path)
+    shutil.copyfile(tmp_folder / 'tmp.data' / f'{outfile_basename_from_snap}.hdr', hdr_path)
 
     # remove snap tmp_dir
     shutil.rmtree(tmp_folder)
