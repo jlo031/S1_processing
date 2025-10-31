@@ -129,7 +129,7 @@ def get_S1_intensity(
 # -------------------------------------------------------------------------- #
 
     # build dB_str for output file name and define outfile_basename
-    dB_str = '_dB' if dB else ''
+    dB_str = '_db' if dB else ''
     outfile_basename = f'Sigma0_{intensity}{dB_str}'
 
     # define output file name and path
